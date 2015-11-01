@@ -174,7 +174,7 @@ public class KeyHandler implements DeviceKeyHandler {
                             UserHandle.CURRENT);
                     action = MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA;
                 }
-                mPowerManager.wakeUp(SystemClock.uptimeMillis());
+                mPowerManager.wakeUp(SystemClock.uptimeMillis(), "wakeup-gesture");
                 Intent intent = new Intent(action, null);
                 startActivitySafely(intent);
                 break;
@@ -210,7 +210,7 @@ public class KeyHandler implements DeviceKeyHandler {
         boolean isKeySupported = ArrayUtils.contains(sSupportedGestures, event.getScanCode());
         if (isKeySupported && !mEventHandler.hasMessages(GESTURE_REQUEST)) {
             if (event.getScanCode() == KEY_DOUBLE_TAP && !mPowerManager.isScreenOn()) {
-                mPowerManager.wakeUpWithProximityCheck(SystemClock.uptimeMillis());
+                mPowerManager.wakeUpWithProximityCheck(SystemClock.uptimeMillis(), "wakeup-gesture-proximity");
                 return true;
             }
             Message msg = getMessageForKeyEvent(event);
