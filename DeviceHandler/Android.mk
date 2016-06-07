@@ -17,6 +17,10 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
+## Slim framework
+LOCAL_JAVA_LIBRARIES += \
+        org.slim.framework
+
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_CERTIFICATE := platform
 LOCAL_PACKAGE_NAME := DeviceHandler
