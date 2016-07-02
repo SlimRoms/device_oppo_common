@@ -61,6 +61,9 @@ public class ScreenOffGesture extends PreferenceFragment implements
     public static final String PREF_GESTURE_ARROW_DOWN = "gesture_arrow_down";
     public static final String PREF_GESTURE_ARROW_LEFT = "gesture_arrow_left";
     public static final String PREF_GESTURE_ARROW_RIGHT = "gesture_arrow_right";
+
+    // Keep this here just for KeyHandler... device Double Tap is removed as
+    // it is in ROM source now - NSD
     public static final String PREF_GESTURE_DOUBLE_TAP = "gesture_double_tap";
 
     private static final int DLG_SHOW_ACTION_DIALOG  = 0;
@@ -138,6 +141,11 @@ public class ScreenOffGesture extends PreferenceFragment implements
         mGestureArrowRight = (Preference) prefs.findPreference(PREF_GESTURE_ARROW_RIGHT);
         mGestureDoubleTap = (Preference) prefs.findPreference(PREF_GESTURE_DOUBLE_TAP);
 
+        // remove Double Tap unconditionally for now
+        if (mGestureDoubleTap != null) {
+            prefs.removePreference(mGestureDoubleTap);
+        }
+
         setupOrUpdatePreference(mGestureCircle, mScreenOffGestureSharedPreferences
                 .getString(PREF_GESTURE_CIRCLE, ActionConstants.ACTION_CAMERA));
         setupOrUpdatePreference(mGestureDoubleSwipe, mScreenOffGestureSharedPreferences
@@ -156,8 +164,6 @@ public class ScreenOffGesture extends PreferenceFragment implements
                 .getString(PREF_GESTURE_ARROW_LEFT, ActionConstants.ACTION_MEDIA_PREVIOUS));
         setupOrUpdatePreference(mGestureArrowRight, mScreenOffGestureSharedPreferences
                 .getString(PREF_GESTURE_ARROW_RIGHT, ActionConstants.ACTION_MEDIA_NEXT));
-        setupOrUpdatePreference(mGestureDoubleTap, mScreenOffGestureSharedPreferences
-                .getString(PREF_GESTURE_DOUBLE_TAP, ActionConstants.ACTION_WAKE_DEVICE));
 
         boolean enableGestures =
                 mScreenOffGestureSharedPreferences.getBoolean(PREF_GESTURE_ENABLE, true);
@@ -218,9 +224,6 @@ public class ScreenOffGesture extends PreferenceFragment implements
         } else if (preference == mGestureArrowRight) {
             settingsKey = PREF_GESTURE_ARROW_RIGHT;
             dialogTitle = R.string.gesture_arrow_right_title;
-        } else if (preference == mGestureDoubleTap) {
-            settingsKey = PREF_GESTURE_DOUBLE_TAP;
-            dialogTitle = R.string.gesture_double_tap_title;
         }
         if (settingsKey != null) {
             showDialogInner(DLG_SHOW_ACTION_DIALOG, settingsKey, dialogTitle);
@@ -260,8 +263,6 @@ public class ScreenOffGesture extends PreferenceFragment implements
                 ActionConstants.ACTION_MEDIA_PREVIOUS).commit();
         editor.putString(PREF_GESTURE_ARROW_RIGHT,
                 ActionConstants.ACTION_MEDIA_NEXT).commit();
-        editor.putString(PREF_GESTURE_DOUBLE_TAP,
-                ActionConstants.ACTION_WAKE_DEVICE).commit();
         editor.commit();
         KernelControl.enableGestures(true);
         reloadSettings();
