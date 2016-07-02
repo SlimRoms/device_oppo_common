@@ -56,7 +56,6 @@ public class KeyHandler implements DeviceKeyHandler {
     private static final int GESTURE_V_SCANCODE = 252;
     private static final int GESTURE_LTR_SCANCODE = 253;
     private static final int GESTURE_GTR_SCANCODE = 254;
-    private static final int KEY_DOUBLE_TAP = 255;
     private static final int MODE_TOTAL_SILENCE = 600;
     private static final int MODE_ALARMS_ONLY = 601;
     private static final int MODE_PRIORITY_ONLY = 602;
@@ -71,7 +70,6 @@ public class KeyHandler implements DeviceKeyHandler {
         GESTURE_V_UP_SCANCODE,
         GESTURE_LTR_SCANCODE,
         GESTURE_GTR_SCANCODE,
-        KEY_DOUBLE_TAP,
         MODE_TOTAL_SILENCE,
         MODE_ALARMS_ONLY,
         MODE_PRIORITY_ONLY,
@@ -156,12 +154,6 @@ public class KeyHandler implements DeviceKeyHandler {
                         ActionConstants.ACTION_MEDIA_NEXT);
                         doHapticFeedback();
                 break;
-            case KEY_DOUBLE_TAP:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_DOUBLE_TAP,
-                        ActionConstants.ACTION_WAKE_DEVICE);
-                        doHapticFeedback();
-                break;
             case MODE_TOTAL_SILENCE:
                 setZenMode(Settings.Global.ZEN_MODE_NO_INTERRUPTIONS);
                 break;
@@ -222,7 +214,6 @@ public class KeyHandler implements DeviceKeyHandler {
         if (isKeySupported && !mEventHandler.hasMessages(GESTURE_REQUEST)) {
             Message msg = getMessageForKeyEvent(event);
             if (scanCode < MODE_TOTAL_SILENCE && mProximitySensor != null) {
-                mEventHandler.sendMessageDelayed(msg, scanCode == KEY_DOUBLE_TAP ? 400 : 200);
                 processEvent(event);
             } else {
                 mEventHandler.sendMessage(msg);

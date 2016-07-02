@@ -32,7 +32,6 @@ import java.io.File;
 public final class KernelControl {
 
     private static String GESTURE_PATH = "/proc/touchpanel/";
-    private static String GESTURE_DOUBLE_TAP       = GESTURE_PATH + "double_tap_enable";
     private static String GESTURE_CAMERA           = GESTURE_PATH + "camera_enable";
     private static String GESTURE_FLASHLIGHT       = GESTURE_PATH + "flashlight_enable";
     private static String GESTURE_MUSIC            = GESTURE_PATH + "music_enable";
@@ -45,7 +44,6 @@ public final class KernelControl {
     public static final String KEYCODE_SLIDER_BOTTOM = "/proc/tri-state-key/keyCode_bottom";
 
     private static String[] GESTURE_CONTROL_NODES = {
-            GESTURE_DOUBLE_TAP,
             GESTURE_CAMERA,
             GESTURE_FLASHLIGHT ,
             GESTURE_MUSIC,
@@ -78,8 +76,7 @@ public final class KernelControl {
      * Do we have touch control at all?
      */
     public static boolean hasTouchscreenGestures() {
-        return new File(GESTURE_DOUBLE_TAP).exists()
-                && new File(GESTURE_CAMERA).exists()
+        return new File(GESTURE_CAMERA).exists()
                 && new File(GESTURE_FLASHLIGHT).exists()
                 && new File(GESTURE_MUSIC).exists();
     }
