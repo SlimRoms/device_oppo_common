@@ -95,7 +95,7 @@ public class KeyHandler implements DeviceKeyHandler {
         mContext = context;
         mEventHandler = new EventHandler();
         mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mNotificationManager
                 = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -173,13 +173,22 @@ public class KeyHandler implements DeviceKeyHandler {
                 setZenMode(Settings.Global.ZEN_MODE_IMPORTANT_INTERRUPTIONS);
                 break;
             case MODE_NONE:
+            {
                 setZenMode(Settings.Global.ZEN_MODE_OFF);
+                mAudioManager.setRingerModeInternal(AudioManager.RINGER_MODE_NORMAL);
+            }
                 break;
             case MODE_VIBRATE:
-                setZenMode(AudioManager.RINGER_MODE_VIBRATE);
+            {
+                mAudioManager.setRingerModeInternal(AudioManager.RINGER_MODE_VIBRATE);
+                setZenMode(Settings.Global.ZEN_MODE_OFF);
+            }
                 break;
             case MODE_RING:
-                setZenMode(AudioManager.RINGER_MODE_NORMAL);
+            {
+                mAudioManager.setRingerModeInternal(AudioManager.RINGER_MODE_NORMAL);
+                setZenMode(Settings.Global.ZEN_MODE_OFF);
+            }
                 break;
             }
             
