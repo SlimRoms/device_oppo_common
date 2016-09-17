@@ -370,6 +370,16 @@ public class ScreenOffGesture extends PreferenceFragment implements
         }
 
         @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            if (item.getItemId() == android.R.id.home) {
+                Activity activity = getActivity();
+                activity.onBackPressed();
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+
+        @Override
         public void onCancel(DialogInterface dialog) {
         }
     }
