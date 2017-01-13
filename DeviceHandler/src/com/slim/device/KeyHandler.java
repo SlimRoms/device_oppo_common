@@ -40,8 +40,8 @@ import com.slim.device.settings.ScreenOffGesture;
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.util.ArrayUtils;
 
-import org.slim.action.Action;
-import org.slim.action.ActionConstants;
+import slim.action.Action;
+import slim.action.ActionConstants;
 
 
 public class KeyHandler implements DeviceKeyHandler {
