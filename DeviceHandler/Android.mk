@@ -27,4 +27,6 @@ LOCAL_PACKAGE_NAME := DeviceHandler
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 LOCAL_DEX_PREOPT := false
 
+include frameworks/base/packages/SettingsLib/common.mk
+
 include $(BUILD_PACKAGE)

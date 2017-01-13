@@ -16,10 +16,11 @@
 
 package com.slim.device.settings;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-public class ScreenOffGestureSettings extends Activity {
+import com.android.settingslib.drawer.SettingsDrawerActivity;
+
+public class ScreenOffGestureSettings extends SettingsDrawerActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
