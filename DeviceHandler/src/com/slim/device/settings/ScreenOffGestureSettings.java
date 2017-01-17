@@ -26,7 +26,7 @@ public class ScreenOffGestureSettings extends SettingsDrawerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
+        getFragmentManager().beginTransaction().replace(R.id.content_frame,
                 new ScreenOffGesture()).commit();
         getActionBar().setDisplayHomeAsUpEnabled(true);
     }
