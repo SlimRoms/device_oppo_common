@@ -17,6 +17,7 @@
 package com.slim.device.settings;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.android.settingslib.drawer.SettingsDrawerActivity;
 
@@ -33,4 +34,14 @@ public class ScreenOffGestureSettings extends SettingsDrawerActivity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
