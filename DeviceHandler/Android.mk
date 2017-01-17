@@ -26,6 +26,7 @@ LOCAL_CERTIFICATE := platform
 LOCAL_PACKAGE_NAME := DeviceHandler
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 LOCAL_DEX_PREOPT := false
+LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
 
 include frameworks/base/packages/SettingsLib/common.mk
 
