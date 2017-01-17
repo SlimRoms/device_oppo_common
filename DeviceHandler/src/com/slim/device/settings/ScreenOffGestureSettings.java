@@ -20,6 +20,8 @@ import android.os.Bundle;
 
 import com.android.settingslib.drawer.SettingsDrawerActivity;
 
+import com.slim.device.R;
+
 public class ScreenOffGestureSettings extends SettingsDrawerActivity {
 
     @Override

@@ -15,6 +15,16 @@
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="DeviceHandlerTheme" parent="android:Theme.Material.Settings">
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
     </style>
+
+    <style name="PreferenceTheme" parent="@android:style/Theme.DeviceDefault.Settings">
+        <item name="preferenceStyle">@style/Preference</item>
+        <item name="editTextPreferenceStyle">@style/EditTextPreference</item>
+        <item name="dropdownPreferenceStyle">@style/Preference.DropDown.Material</item>
+        <item name="preferenceFragmentStyle">@style/PreferenceFragmentStyle</item>
+    </style>
+
+    
 </resources>
 
