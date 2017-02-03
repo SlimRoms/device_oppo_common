@@ -26,6 +26,7 @@ import android.preference.PreferenceManager;
 
 import com.slim.device.KernelControl;
 import com.slim.device.settings.ScreenOffGesture;
+import com.slim.device.settings.ScreenOffGestureSettings;
 import com.slim.device.settings.SliderSettings;
 import com.slim.device.util.FileUtils;
 
@@ -38,7 +39,7 @@ public class BootReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
             // Disable touchscreen gesture settings if needed
             if (!KernelControl.hasTouchscreenGestures()) {
-                disableComponent(context, ScreenOffGesture.class.getName());
+                disableComponent(context, ScreenOffGestureSettings.class.getName());
             } else {
                 enableComponent(context, ScreenOffGesture.class.getName());
 
