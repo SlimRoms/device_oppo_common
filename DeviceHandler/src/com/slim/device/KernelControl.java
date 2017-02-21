@@ -32,10 +32,12 @@ import java.io.File;
 public final class KernelControl {
 
     private static String GESTURE_PATH = "/proc/touchpanel/";
-    private static String GESTURE_CAMERA           = GESTURE_PATH + "camera_enable";
-    private static String GESTURE_FLASHLIGHT       = GESTURE_PATH + "flashlight_enable";
-    private static String GESTURE_MUSIC            = GESTURE_PATH + "music_enable";
-    private static String GESTURE_SILENT_VIB_SOUND = GESTURE_PATH + "silent_vib_sound_enable";
+    private static String GESTURE_CAMERA           = GESTURE_PATH + "letter_o_enable";
+    private static String GESTURE_FLASHLIGHT       = GESTURE_PATH + "up_arrow_enable";
+    private static String GESTURE_MUSIC            = GESTURE_PATH + "double_swipe_enable";
+    private static String GESTURE_MUSIC_PREVIOUS	= GESTURE_PATH + "right_arrow_enable";
+    private static String GESTURE_MUSIC_NEXT		= GESTURE_PATH + "left_arrow_enable";
+    private static String GESTURE_SILENT_VIB_SOUND = GESTURE_PATH + "down_arrow_enable";
 
     // Notification slider
     public static final String SLIDER_SWAP_NODE = "/proc/s1302/key_rep";
@@ -47,7 +49,10 @@ public final class KernelControl {
             GESTURE_CAMERA,
             GESTURE_FLASHLIGHT ,
             GESTURE_MUSIC,
-            GESTURE_SILENT_VIB_SOUND};
+            GESTURE_MUSIC_PREVIOUS,
+            GESTURE_MUSIC_NEXT,
+            GESTURE_SILENT_VIB_SOUND
+    };
 
     private KernelControl() {
         // this class is not supposed to be instantiated
@@ -62,14 +67,6 @@ public final class KernelControl {
                 FileUtils.writeLine(GESTURE_CONTROL_NODES[i], enable ? "1" : "0");
             }
         }
-    }
-
-    /**
-     * Check if kernel supports arrow up gesture - slim specific.
-     * As well ugly but needed for now.
-     */
-    public static boolean isArrowUpSupported() {
-        return new File(GESTURE_SILENT_VIB_SOUND).exists();
     }
 
     /**
