@@ -32,6 +32,7 @@ import android.os.PowerManager.WakeLock;
 import android.os.SystemProperties;
 import android.os.Vibrator;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -50,13 +51,6 @@ public class KeyHandler implements DeviceKeyHandler {
     private static final int GESTURE_REQUEST = 1;
 
     // Supported scancodes
-    private static final int GESTURE_V_UP_SCANCODE = 249;
-    private static final int GESTURE_CIRCLE_SCANCODE = 250;
-    private static final int GESTURE_SWIPE_DOWN_SCANCODE = 251;
-    private static final int GESTURE_V_SCANCODE = 252;
-    private static final int GESTURE_LTR_SCANCODE = 253;
-    private static final int GESTURE_GTR_SCANCODE = 254;
-    private static final int KEY_DOUBLE_TAP = 255;
     private static final int MODE_TOTAL_SILENCE = 600;
     private static final int MODE_ALARMS_ONLY = 601;
     private static final int MODE_PRIORITY_ONLY = 602;
@@ -65,13 +59,6 @@ public class KeyHandler implements DeviceKeyHandler {
     private static final int MODE_RING = 605;
 
     private static final int[] sSupportedGestures = new int[]{
-        GESTURE_CIRCLE_SCANCODE,
-        GESTURE_SWIPE_DOWN_SCANCODE,
-        GESTURE_V_SCANCODE,
-        GESTURE_V_UP_SCANCODE,
-        GESTURE_LTR_SCANCODE,
-        GESTURE_GTR_SCANCODE,
-        KEY_DOUBLE_TAP,
         MODE_TOTAL_SILENCE,
         MODE_ALARMS_ONLY,
         MODE_PRIORITY_ONLY,
@@ -121,48 +108,6 @@ public class KeyHandler implements DeviceKeyHandler {
             KeyEvent event = (KeyEvent) msg.obj;
             String action = null;
             switch(event.getScanCode()) {
-            case GESTURE_CIRCLE_SCANCODE:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_CIRCLE,
-                        ActionConstants.ACTION_CAMERA);
-                        doHapticFeedback();
-                break;
-            case GESTURE_SWIPE_DOWN_SCANCODE:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_DOUBLE_SWIPE,
-                        ActionConstants.ACTION_MEDIA_PLAY_PAUSE);
-                        doHapticFeedback();
-                break;
-            case GESTURE_V_SCANCODE:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_ARROW_DOWN,
-                        ActionConstants.ACTION_VIB_SILENT);
-                        doHapticFeedback();
-                break;
-            case GESTURE_V_UP_SCANCODE:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_ARROW_UP,
-                        ActionConstants.ACTION_TORCH);
-                        doHapticFeedback();
-                break;
-            case GESTURE_LTR_SCANCODE:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_ARROW_LEFT,
-                        ActionConstants.ACTION_MEDIA_PREVIOUS);
-                        doHapticFeedback();
-                break;
-            case GESTURE_GTR_SCANCODE:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_ARROW_RIGHT,
-                        ActionConstants.ACTION_MEDIA_NEXT);
-                        doHapticFeedback();
-                break;
-            case KEY_DOUBLE_TAP:
-                action = getGestureSharedPreferences()
-                        .getString(ScreenOffGesture.PREF_GESTURE_DOUBLE_TAP,
-                        ActionConstants.ACTION_WAKE_DEVICE);
-                        doHapticFeedback();
-                break;
             case MODE_TOTAL_SILENCE:
                 setZenMode(Settings.Global.ZEN_MODE_NO_INTERRUPTIONS);
                 break;
@@ -181,8 +126,13 @@ public class KeyHandler implements DeviceKeyHandler {
             case MODE_RING:
                 setRingerModeInternal(AudioManager.RINGER_MODE_NORMAL);
                 break;
+            default:
+                action = getScreenOffGesturePref(event.getScanCode());
+                break;
             }
-            
+
+            Log.d("TEST", "scanCode=" + event.getScanCode() + "action=" + action);
+
             if (action == null || action != null && action.equals(ActionConstants.ACTION_NULL)) {
                 return;
             }
@@ -190,8 +140,26 @@ public class KeyHandler implements DeviceKeyHandler {
                     || !action.startsWith("**")) {
                 Action.processAction(mContext, ActionConstants.ACTION_WAKE_DEVICE, false);
             }
+            doHapticFeedback();
             Action.processAction(mContext, action, false);
         }
+    }
+
+    private String getScreenOffGesturePref(int scanCode) {
+        String action = getGestureSharedPreferences().getString(
+                ScreenOffGesture.buildPreferenceKey(scanCode), null);
+        if (TextUtils.isEmpty(action)) {
+            int[] gestureCodes =
+                    mGestureContext.getResources().getIntArray(R.array.gesture_scancodes);
+            String[] gestureDefaults =
+                    mGestureContext.getResources().getStringArray(R.array.gesture_defaults);
+            for (int i = 0; i < gestureCodes.length; i++) {
+                if (gestureCodes[i] == scanCode) {
+                    return gestureDefaults[i];
+                }
+            }
+        }
+        return action;
     }
 
     private void setZenMode(int mode) {
@@ -226,17 +194,25 @@ public class KeyHandler implements DeviceKeyHandler {
             return false;
         }
         int scanCode = event.getScanCode();
-        boolean isKeySupported = ArrayUtils.contains(sSupportedGestures, scanCode);
+        boolean isKeySupported = isKeySupported(event.getScanCode());
         if (isKeySupported && !mEventHandler.hasMessages(GESTURE_REQUEST)) {
             Message msg = getMessageForKeyEvent(event);
             if (scanCode < MODE_TOTAL_SILENCE && mProximitySensor != null) {
-                mEventHandler.sendMessageDelayed(msg, scanCode == KEY_DOUBLE_TAP ? 400 : 200);
+                mEventHandler.sendMessageDelayed(msg, 200);
                 processEvent(event);
             } else {
                 mEventHandler.sendMessage(msg);
             }
         }
         return isKeySupported;
+    }
+
+    private boolean isKeySupported(int scanCode) {
+        if (ArrayUtils.contains(sSupportedGestures, scanCode))
+            return true;
+
+        int[] gestureCodes = mGestureContext.getResources().getIntArray(R.array.gesture_scancodes);
+        return ArrayUtils.contains(gestureCodes, scanCode);
     }
 
     private Message getMessageForKeyEvent(KeyEvent keyEvent) {
