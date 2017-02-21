@@ -47,7 +47,8 @@ public final class KernelControl {
             GESTURE_CAMERA,
             GESTURE_FLASHLIGHT ,
             GESTURE_MUSIC,
-            GESTURE_SILENT_VIB_SOUND};
+            GESTURE_SILENT_VIB_SOUND
+    };
 
     private KernelControl() {
         // this class is not supposed to be instantiated
