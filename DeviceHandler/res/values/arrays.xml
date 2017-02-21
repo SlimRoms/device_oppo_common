@@ -31,4 +31,31 @@
         <item>605</item>
     </string-array>
 
+    <integer-array name="gesture_scancodes" translatable="false">
+        <item>252</item>
+        <item>253</item>
+        <item>254</item>
+        <item>255</item>
+        <item>250</item>
+        <item>251</item>
+    </integer-array>
+
+    <string-array name="gesture_titles" translatable="false">
+        <item>@string/gesture_arrow_down_title</item>
+        <item>@string/gesture_arrow_left_title</item>
+        <item>@string/gesture_arrow_right_title</item>
+        <item>@string/gesture_arrow_up_title</item>
+        <item>@string/gesture_circle_title</item>
+        <item>@string/gesture_double_swipe_title</item>
+    </string-array>
+
+    <string-array name="gesture_defaults" translatable="false">
+        <item>**ring_vib_silent**</item>
+        <item>**media_previous**</item>
+        <item>**media_next**</item>
+        <item>**torch**</item>
+        <item>**camera**</item>
+        <item>**media_play_pause**</item>
+    </string-array>
+
 </resources>
