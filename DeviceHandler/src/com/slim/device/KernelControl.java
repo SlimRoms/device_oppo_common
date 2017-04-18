@@ -16,7 +16,13 @@
 
 package com.slim.device;
 
+import android.content.Context;
+import android.util.SparseArray;
+
 import com.slim.device.util.FileUtils;
+import com.slim.device.util.TouchscreenGestureParser;
+import com.slim.device.util.TouchscreenGestureParser.Gesture;
+import com.slim.device.util.TouchscreenGestureParser.GesturesArray;
 
 import java.io.File;
 
@@ -31,28 +37,11 @@ import java.io.File;
 
 public final class KernelControl {
 
-    private static String GESTURE_PATH = "/proc/touchpanel/";
-    private static String GESTURE_CAMERA           = GESTURE_PATH + "letter_o_enable";
-    private static String GESTURE_FLASHLIGHT       = GESTURE_PATH + "up_arrow_enable";
-    private static String GESTURE_MUSIC            = GESTURE_PATH + "double_swipe_enable";
-    private static String GESTURE_MUSIC_PREVIOUS	= GESTURE_PATH + "right_arrow_enable";
-    private static String GESTURE_MUSIC_NEXT		= GESTURE_PATH + "left_arrow_enable";
-    private static String GESTURE_SILENT_VIB_SOUND = GESTURE_PATH + "down_arrow_enable";
-
     // Notification slider
     public static final String SLIDER_SWAP_NODE = "/proc/s1302/key_rep";
     public static final String KEYCODE_SLIDER_TOP = "/proc/tri-state-key/keyCode_top";
     public static final String KEYCODE_SLIDER_MIDDLE = "/proc/tri-state-key/keyCode_middle";
     public static final String KEYCODE_SLIDER_BOTTOM = "/proc/tri-state-key/keyCode_bottom";
-
-    private static String[] GESTURE_CONTROL_NODES = {
-            GESTURE_CAMERA,
-            GESTURE_FLASHLIGHT ,
-            GESTURE_MUSIC,
-            GESTURE_MUSIC_PREVIOUS,
-            GESTURE_MUSIC_NEXT,
-            GESTURE_SILENT_VIB_SOUND
-    };
 
     private KernelControl() {
         // this class is not supposed to be instantiated
@@ -61,10 +50,11 @@ public final class KernelControl {
     /**
      * Enable or disable gesture control.
      */
-    public static void enableGestures(boolean enable) {
-        for (int i = 0; i < GESTURE_CONTROL_NODES.length; i++) {
-            if (new File(GESTURE_CONTROL_NODES[i]).exists()) {
-                FileUtils.writeLine(GESTURE_CONTROL_NODES[i], enable ? "1" : "0");
+    public static void enableGestures(Context context, boolean enable) {
+        GesturesArray gestures = TouchscreenGestureParser.parseGestures(context);
+        for (Gesture gesture : gestures) {
+            if (new File(gesture.path).exists()) {
+                FileUtils.writeLine(gesture.path, enable ? "1" : "0");
             }
         }
     }
@@ -72,10 +62,15 @@ public final class KernelControl {
     /**
      * Do we have touch control at all?
      */
-    public static boolean hasTouchscreenGestures() {
-        return new File(GESTURE_CAMERA).exists()
-                && new File(GESTURE_FLASHLIGHT).exists()
-                && new File(GESTURE_MUSIC).exists();
+    public static boolean hasTouchscreenGestures(Context context) {
+        GesturesArray gestures = TouchscreenGestureParser.parseGestures(context);
+        for (Gesture gesture : gestures) {
+            if (new File(gesture.path).exists()) {
+                // We only need atleast one
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean hasSlider() {

@@ -45,9 +45,14 @@ import slim.action.ActionConstants;
 import slim.action.ActionHelper;
 import slim.utils.AppHelper;
 
+import java.io.File;
+
 import com.slim.device.KernelControl;
 import com.slim.device.R;
 import com.slim.device.util.ShortcutPickerHelper;
+import com.slim.device.util.TouchscreenGestureParser;
+import com.slim.device.util.TouchscreenGestureParser.Gesture;
+import com.slim.device.util.TouchscreenGestureParser.GesturesArray;
 
 public class ScreenOffGesture extends PreferenceFragment implements
         OnPreferenceChangeListener,
@@ -70,6 +75,7 @@ public class ScreenOffGesture extends PreferenceFragment implements
     private ShortcutPickerHelper mPicker;
     private String mPendingSettingsKey;
     private ActionsArray mActionsArray;
+    private GesturesArray mGestures;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,6 +87,8 @@ public class ScreenOffGesture extends PreferenceFragment implements
                 GESTURE_SETTINGS, Activity.MODE_PRIVATE);
 
         mActionsArray = new ActionsArray(getActivity(), true);
+
+        mGestures = TouchscreenGestureParser.parseGestures(getActivity());
 
         // Attach final settings screen.
         reloadSettings();
@@ -111,14 +119,12 @@ public class ScreenOffGesture extends PreferenceFragment implements
 
         PreferenceCategory gestures = (PreferenceCategory) prefs.findPreference("gestures");
         
-        String[] gestureNames = getContext().getResources().getStringArray(R.array.gesture_titles);
-        int[] gestureCodes = getContext().getResources().getIntArray(R.array.gesture_scancodes);
-        String[] gestureDefaults =
-                getContext().getResources().getStringArray(R.array.gesture_defaults);
-        for (int i = 0; i < gestureNames.length; i++) {
-            GesturePreference pref = new GesturePreference(getContext(),
-                    gestureCodes[i], gestureNames[i], gestureDefaults[i]);
-            gestures.addPreference(pref);
+        for (Gesture gesture : mGestures) {
+            if (new File(gesture.path).exists()) {
+                GesturePreference pref = new GesturePreference(getContext(),
+                        gesture.scancode, gesture.name, gesture.def);
+                gestures.addPreference(pref);
+            }
         }
 
         return prefs;
@@ -143,7 +149,7 @@ public class ScreenOffGesture extends PreferenceFragment implements
         if (preference == mEnableGestures) {
             mScreenOffGestureSharedPreferences.edit()
                     .putBoolean(PREF_GESTURE_ENABLE, (Boolean) newValue).commit();
-            KernelControl.enableGestures((Boolean) newValue);
+            KernelControl.enableGestures(getActivity(), (Boolean) newValue);
             return true;
         }
         return false;
@@ -154,14 +160,11 @@ public class ScreenOffGesture extends PreferenceFragment implements
         SharedPreferences.Editor editor = context.getSharedPreferences(
                 GESTURE_SETTINGS, Activity.MODE_PRIVATE).edit();
          editor.putBoolean(PREF_GESTURE_ENABLE, true);
-        int[] gestureCodes = getContext().getResources().getIntArray(R.array.gesture_scancodes);
-        String[] gestureDefaults =
-                getContext().getResources().getStringArray(R.array.gesture_defaults);
-        for (int i = 0; i < gestureCodes.length; i++) {
-            editor.putString(buildPreferenceKey(gestureCodes[i]), gestureDefaults[i]);
+        for (Gesture gesture : mGestures) {
+            editor.putString(buildPreferenceKey(gesture.scancode), gesture.def);
         }
         editor.apply();
-        KernelControl.enableGestures(true);
+        KernelControl.enableGestures(getActivity(), true);
         reloadSettings();
     }
 
@@ -305,6 +308,11 @@ public class ScreenOffGesture extends PreferenceFragment implements
             mScreenOffGestureSharedPreferences.edit()
                     .putString(getKey(), value).apply();
             return true;
+        }
+      
+        @Override
+        protected boolean isPersisted() {
+            return mScreenOffGestureSharedPreferences.contains(getKey());
         }
     }
 }

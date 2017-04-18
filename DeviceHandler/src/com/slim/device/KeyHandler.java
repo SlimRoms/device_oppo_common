@@ -37,6 +37,9 @@ import android.util.Log;
 import android.view.KeyEvent;
 
 import com.slim.device.settings.ScreenOffGesture;
+import com.slim.device.util.TouchscreenGestureParser;
+import com.slim.device.util.TouchscreenGestureParser.Gesture;
+import com.slim.device.util.TouchscreenGestureParser.GesturesArray;
 
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.util.ArrayUtils;
@@ -78,6 +81,8 @@ public class KeyHandler implements DeviceKeyHandler {
     private Vibrator mVibrator;
     WakeLock mProximityWakeLock;
 
+    private GesturesArray mGestures;
+
     public KeyHandler(Context context) {
         mContext = context;
         mEventHandler = new EventHandler();
@@ -100,6 +105,8 @@ public class KeyHandler implements DeviceKeyHandler {
                     "com.slim.device", Context.CONTEXT_IGNORE_SECURITY);
         } catch (NameNotFoundException e) {
         }
+
+        mGestures = TouchscreenGestureParser.parseGestures(mGestureContext);
     }
 
     private class EventHandler extends Handler {
@@ -131,14 +138,8 @@ public class KeyHandler implements DeviceKeyHandler {
                 break;
             }
 
-            Log.d("TEST", "scanCode=" + event.getScanCode() + "action=" + action);
-
             if (action == null || action != null && action.equals(ActionConstants.ACTION_NULL)) {
                 return;
-            }
-            if (action.equals(ActionConstants.ACTION_CAMERA)
-                    || !action.startsWith("**")) {
-                Action.processAction(mContext, ActionConstants.ACTION_WAKE_DEVICE, false);
             }
             doHapticFeedback();
             Action.processAction(mContext, action, false);
@@ -149,15 +150,7 @@ public class KeyHandler implements DeviceKeyHandler {
         String action = getGestureSharedPreferences().getString(
                 ScreenOffGesture.buildPreferenceKey(scanCode), null);
         if (TextUtils.isEmpty(action)) {
-            int[] gestureCodes =
-                    mGestureContext.getResources().getIntArray(R.array.gesture_scancodes);
-            String[] gestureDefaults =
-                    mGestureContext.getResources().getStringArray(R.array.gesture_defaults);
-            for (int i = 0; i < gestureCodes.length; i++) {
-                if (gestureCodes[i] == scanCode) {
-                    return gestureDefaults[i];
-                }
-            }
+            return mGestures.get(scanCode).def;
         }
         return action;
     }
@@ -211,8 +204,7 @@ public class KeyHandler implements DeviceKeyHandler {
         if (ArrayUtils.contains(sSupportedGestures, scanCode))
             return true;
 
-        int[] gestureCodes = mGestureContext.getResources().getIntArray(R.array.gesture_scancodes);
-        return ArrayUtils.contains(gestureCodes, scanCode);
+        return mGestures.get(scanCode) != null;
     }
 
     private Message getMessageForKeyEvent(KeyEvent keyEvent) {
