@@ -126,6 +126,7 @@ public class KeyHandler implements DeviceKeyHandler {
                 break;
             case MODE_NONE:
                 setZenMode(Settings.Global.ZEN_MODE_OFF);
+                setRingerModeInternal(AudioManager.RINGER_MODE_NORMAL);
                 break;
             case MODE_VIBRATE:
                 setRingerModeInternal(AudioManager.RINGER_MODE_VIBRATE);
